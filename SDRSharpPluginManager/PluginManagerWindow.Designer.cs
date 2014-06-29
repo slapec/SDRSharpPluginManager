@@ -27,8 +27,11 @@
             this.lblSDRSharpPath = new System.Windows.Forms.Label();
             this.tBoxSDRSharpPathValue = new System.Windows.Forms.TextBox();
             this.listPlugins = new System.Windows.Forms.ListView();
-            this.button1 = new System.Windows.Forms.Button();
-            this.button2 = new System.Windows.Forms.Button();
+            this.btnRemove = new System.Windows.Forms.Button();
+            this.btnAdd = new System.Windows.Forms.Button();
+            this.colName = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colType = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
+            this.colAssembly = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lnkProjectHome
@@ -68,39 +71,68 @@
             this.listPlugins.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listPlugins.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colName,
+            this.colType,
+            this.colAssembly});
+            this.listPlugins.FullRowSelect = true;
+            this.listPlugins.GridLines = true;
             this.listPlugins.Location = new System.Drawing.Point(15, 35);
+            this.listPlugins.MultiSelect = false;
             this.listPlugins.Name = "listPlugins";
+            this.listPlugins.ShowGroups = false;
             this.listPlugins.Size = new System.Drawing.Size(564, 297);
             this.listPlugins.TabIndex = 3;
             this.listPlugins.UseCompatibleStateImageBehavior = false;
+            this.listPlugins.View = System.Windows.Forms.View.Details;
             // 
-            // button1
+            // btnRemove
             // 
-            this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(424, 338);
-            this.button1.Name = "button1";
-            this.button1.Size = new System.Drawing.Size(75, 23);
-            this.button1.TabIndex = 4;
-            this.button1.Text = "Remove";
-            this.button1.UseVisualStyleBackColor = true;
+            this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnRemove.Enabled = false;
+            this.btnRemove.Location = new System.Drawing.Point(424, 338);
+            this.btnRemove.Name = "btnRemove";
+            this.btnRemove.Size = new System.Drawing.Size(75, 23);
+            this.btnRemove.TabIndex = 4;
+            this.btnRemove.Text = "Remove";
+            this.btnRemove.UseVisualStyleBackColor = true;
             // 
-            // button2
+            // btnAdd
             // 
-            this.button2.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.button2.Location = new System.Drawing.Point(505, 338);
-            this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(75, 23);
-            this.button2.TabIndex = 5;
-            this.button2.Text = "Add";
-            this.button2.UseVisualStyleBackColor = true;
+            this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+            this.btnAdd.Location = new System.Drawing.Point(505, 338);
+            this.btnAdd.Name = "btnAdd";
+            this.btnAdd.Size = new System.Drawing.Size(75, 23);
+            this.btnAdd.TabIndex = 5;
+            this.btnAdd.Text = "Add";
+            this.btnAdd.UseVisualStyleBackColor = true;
+            this.btnAdd.Click += new System.EventHandler(this.btnAdd_Click);
+            // 
+            // colName
+            // 
+            this.colName.Tag = "";
+            this.colName.Text = "Name";
+            this.colName.Width = 40;
+            // 
+            // colType
+            // 
+            this.colType.Tag = "";
+            this.colType.Text = "Type";
+            this.colType.Width = 36;
+            // 
+            // colAssembly
+            // 
+            this.colAssembly.Tag = "";
+            this.colAssembly.Text = "Assembly";
+            this.colAssembly.Width = 484;
             // 
             // PluginManagerWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(592, 373);
-            this.Controls.Add(this.button2);
-            this.Controls.Add(this.button1);
+            this.Controls.Add(this.btnAdd);
+            this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.listPlugins);
             this.Controls.Add(this.tBoxSDRSharpPathValue);
             this.Controls.Add(this.lblSDRSharpPath);
@@ -120,8 +152,11 @@
         private System.Windows.Forms.Label lblSDRSharpPath;
         private System.Windows.Forms.TextBox tBoxSDRSharpPathValue;
         private System.Windows.Forms.ListView listPlugins;
-        private System.Windows.Forms.Button button1;
-        private System.Windows.Forms.Button button2;
+        private System.Windows.Forms.Button btnRemove;
+        private System.Windows.Forms.Button btnAdd;
+        private System.Windows.Forms.ColumnHeader colName;
+        private System.Windows.Forms.ColumnHeader colType;
+        private System.Windows.Forms.ColumnHeader colAssembly;
 
     }
 }
