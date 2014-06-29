@@ -3,21 +3,43 @@ using System.IO;
 using System.Windows.Forms;
 using System.Configuration;
 using System.Xml;
+using System.Reflection;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
-        public enum ProcessResult {
-            Success = 0, 
-            Missing = 1
-        };
+        public enum ProcessResult {Success = 0, Missing = 1};
         public static String SDRSharpCommonDllFName = "SDRSharp.Common.dll";
         public static String SDRSharpExe = "SDRSharp.exe.Config";
         public static String[] RequiredFiles = {SDRSharpCommonDllFName, SDRSharpExe};
 
         private FolderBrowserDialog sdrSharpFolderDialog;
+        private OpenFileDialog pluginFileDialog;
 
         public PluginManagerWindow() {
             InitializeComponent();
+        }
+
+        #region Parsing config file
+        private void PluginManagerWindow_Load(object sender, EventArgs e) {
+            DialogResult dialogResult;
+            ProcessResult processResult;
+
+            sdrSharpFolderDialog = new FolderBrowserDialog();
+            sdrSharpFolderDialog.Description = "Select the location of SDR#";
+            sdrSharpFolderDialog.SelectedPath = @"d:\apps\sdr\sdrsharp\"; //Directory.GetCurrentDirectory();
+            sdrSharpFolderDialog.ShowNewFolderButton = false;
+
+            processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
+            while (processResult != ProcessResult.Success) {
+                dialogResult = sdrSharpFolderDialog.ShowDialog();
+                if (dialogResult == DialogResult.Cancel) {
+                    this.Close();
+                    break;
+                }
+                else {
+                    processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
+                }
+            }
         }
 
         private ProcessResult ProcessDirectory(String path) {
@@ -60,36 +82,35 @@ namespace SDRSharpPluginManager {
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
             }
+
+            FitColumns();
         }
+        #endregion
 
-        private void PluginManagerWindow_Load(object sender, EventArgs e) {
-            DialogResult dialogResult;
-            ProcessResult processResult;
+        #region Parsing plugin dll
+        private void btnAdd_Click(object sender, EventArgs e) {
+            pluginFileDialog = new OpenFileDialog();
+            pluginFileDialog.Filter = "SDRSharp Plugins (*.dll)|*.dll";
 
-            sdrSharpFolderDialog = new FolderBrowserDialog();
-            sdrSharpFolderDialog.Description = "Select the location of SDR#";
-            sdrSharpFolderDialog.SelectedPath = Directory.GetCurrentDirectory();
-            sdrSharpFolderDialog.ShowNewFolderButton = false;
-
-            processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
-            while (processResult != ProcessResult.Success) {
-                dialogResult = sdrSharpFolderDialog.ShowDialog();
-                if (dialogResult == DialogResult.Cancel) {
-                    this.Close();
-                    break;
-                }
-                else {
-                    processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
-                }
+            if (pluginFileDialog.ShowDialog() == DialogResult.OK) {
+                String pluginFilePath = pluginFileDialog.InitialDirectory + pluginFileDialog.FileName;
+                LoadDll(pluginFilePath);
             }
         }
 
+        private void LoadDll(String path) {
+            Assembly plugin = Assembly.LoadFrom(path);
+        }
+        #endregion
+
         private void lnkProjectHome_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-            System.Diagnostics.Process.Start(lnkProjectHome.Text);
+                    System.Diagnostics.Process.Start(lnkProjectHome.Text);
         }
 
-        private void btnAdd_Click(object sender, EventArgs e) {
-            
+        private void FitColumns() {
+            listPlugins.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent);
+            listPlugins.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
+            listPlugins.AutoResizeColumn(2, ColumnHeaderAutoResizeStyle.ColumnContent);
         }
     }
 }

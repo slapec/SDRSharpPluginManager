@@ -63,7 +63,7 @@
             this.tBoxSDRSharpPathValue.Location = new System.Drawing.Point(83, 13);
             this.tBoxSDRSharpPathValue.Name = "tBoxSDRSharpPathValue";
             this.tBoxSDRSharpPathValue.ReadOnly = true;
-            this.tBoxSDRSharpPathValue.Size = new System.Drawing.Size(496, 13);
+            this.tBoxSDRSharpPathValue.Size = new System.Drawing.Size(596, 13);
             this.tBoxSDRSharpPathValue.TabIndex = 2;
             // 
             // listPlugins
@@ -81,7 +81,7 @@
             this.listPlugins.MultiSelect = false;
             this.listPlugins.Name = "listPlugins";
             this.listPlugins.ShowGroups = false;
-            this.listPlugins.Size = new System.Drawing.Size(564, 297);
+            this.listPlugins.Size = new System.Drawing.Size(664, 297);
             this.listPlugins.TabIndex = 3;
             this.listPlugins.UseCompatibleStateImageBehavior = false;
             this.listPlugins.View = System.Windows.Forms.View.Details;
@@ -90,7 +90,7 @@
             // 
             this.btnRemove.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnRemove.Enabled = false;
-            this.btnRemove.Location = new System.Drawing.Point(424, 338);
+            this.btnRemove.Location = new System.Drawing.Point(524, 338);
             this.btnRemove.Name = "btnRemove";
             this.btnRemove.Size = new System.Drawing.Size(75, 23);
             this.btnRemove.TabIndex = 4;
@@ -100,7 +100,7 @@
             // btnAdd
             // 
             this.btnAdd.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
-            this.btnAdd.Location = new System.Drawing.Point(505, 338);
+            this.btnAdd.Location = new System.Drawing.Point(605, 338);
             this.btnAdd.Name = "btnAdd";
             this.btnAdd.Size = new System.Drawing.Size(75, 23);
             this.btnAdd.TabIndex = 5;
@@ -130,14 +130,14 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(592, 373);
+            this.ClientSize = new System.Drawing.Size(692, 373);
             this.Controls.Add(this.btnAdd);
             this.Controls.Add(this.btnRemove);
             this.Controls.Add(this.listPlugins);
             this.Controls.Add(this.tBoxSDRSharpPathValue);
             this.Controls.Add(this.lblSDRSharpPath);
             this.Controls.Add(this.lnkProjectHome);
-            this.MinimumSize = new System.Drawing.Size(600, 400);
+            this.MinimumSize = new System.Drawing.Size(700, 400);
             this.Name = "PluginManagerWindow";
             this.Text = "SDRSharp Plugin Manager";
             this.Load += new System.EventHandler(this.PluginManagerWindow_Load);
