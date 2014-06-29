@@ -19,18 +19,22 @@ namespace SDRSharpPluginManager {
         private ProcessResult ProcessDirectory(String path) {
             Directory.SetCurrentDirectory(path);
 
+            Console.WriteLine(path);
+
             foreach (String requiredFileName in RequiredFiles) {
                 if (!File.Exists(requiredFileName)) {
-                    String msg = String.Format("File '{0}' is required to run this program but not found in {1}", requiredFileName, path);
+                    String msg = String.Format("File '{0}' is not found in '{1}'", requiredFileName, path);
 
                     MessageBox.Show(msg, "Missing file", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     return ProcessResult.Missing;
                 }
             }
+
+            tBoxSDRSharpPathValue.Text = path;
+
             return ProcessResult.Success;
         }
 
-        #region Set cwd to SDRSharp's directory
         private void PluginManagerWindow_Load(object sender, EventArgs e) {
             DialogResult dialogResult;
             ProcessResult processResult;
@@ -41,7 +45,7 @@ namespace SDRSharpPluginManager {
             sdrSharpFolderDialog.ShowNewFolderButton = false;
 
             processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
-            while (processResult != ProcessResult.Success) {
+            /*while (processResult != ProcessResult.Success) {
                 dialogResult = sdrSharpFolderDialog.ShowDialog();
                 if (dialogResult == DialogResult.Cancel) {
                     this.Close();
@@ -50,9 +54,11 @@ namespace SDRSharpPluginManager {
                 else {
                     processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
                 }
-            }
-            MessageBox.Show("Show UI");
+            }*/
         }
-        #endregion
+
+        private void lnkProjectHome_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
+            System.Diagnostics.Process.Start(lnkProjectHome.Text);
+        }
     }
 }
