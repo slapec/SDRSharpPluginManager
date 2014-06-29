@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.Configuration;
 using System.Xml;
 using System.Reflection;
+using System.Linq;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
@@ -11,6 +12,10 @@ namespace SDRSharpPluginManager {
         public static String SDRSharpCommonDllFName = "SDRSharp.Common.dll";
         public static String SDRSharpExe = "SDRSharp.exe.Config";
         public static String[] RequiredFiles = {SDRSharpCommonDllFName, SDRSharpExe};
+        public static String PluginInterfaceName = "ISharpPlugin";
+        public static String DisplayNameFieldName = "_displayName";
+
+        public static String PluginFileFilter = "SDRSharp Plugins (*.dll)|*.dll";
 
         private FolderBrowserDialog sdrSharpFolderDialog;
         private OpenFileDialog pluginFileDialog;
@@ -26,7 +31,7 @@ namespace SDRSharpPluginManager {
 
             sdrSharpFolderDialog = new FolderBrowserDialog();
             sdrSharpFolderDialog.Description = "Select the location of SDR#";
-            sdrSharpFolderDialog.SelectedPath = @"d:\apps\sdr\sdrsharp\"; //Directory.GetCurrentDirectory();
+            sdrSharpFolderDialog.SelectedPath = Directory.GetCurrentDirectory();
             sdrSharpFolderDialog.ShowNewFolderButton = false;
 
             processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
@@ -55,9 +60,7 @@ namespace SDRSharpPluginManager {
             }
 
             tBoxSDRSharpPathValue.Text = path;
-
             this.LoadConfig();
-
             return ProcessResult.Success;
         }
 
@@ -90,7 +93,7 @@ namespace SDRSharpPluginManager {
         #region Parsing plugin dll
         private void btnAdd_Click(object sender, EventArgs e) {
             pluginFileDialog = new OpenFileDialog();
-            pluginFileDialog.Filter = "SDRSharp Plugins (*.dll)|*.dll";
+            pluginFileDialog.Filter = PluginFileFilter;
 
             if (pluginFileDialog.ShowDialog() == DialogResult.OK) {
                 String pluginFilePath = pluginFileDialog.InitialDirectory + pluginFileDialog.FileName;
@@ -99,12 +102,35 @@ namespace SDRSharpPluginManager {
         }
 
         private void LoadDll(String path) {
-            Assembly plugin = Assembly.LoadFrom(path);
+            try {
+                Assembly pluginAssembly = Assembly.LoadFrom(path);
+
+                Type pluginEntryType = (from type in pluginAssembly.GetTypes()
+                                        where type.GetInterface(PluginInterfaceName) != null
+                                        select type).First();
+                String name = (String)pluginEntryType.GetField(DisplayNameFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                String assemblyName = pluginAssembly.GetName().Name;
+                String typeName = String.Format("{0}.{1}", assemblyName, pluginEntryType.Name);
+
+                ListViewItem pluginItem = new ListViewItem(name);
+                listPlugins.Items.Add(pluginItem);
+
+                pluginItem.Font = new System.Drawing.Font(pluginItem.Font, pluginItem.Font.Style | System.Drawing.FontStyle.Bold);
+
+                pluginItem.SubItems.Add(typeName);
+                pluginItem.SubItems.Add(assemblyName);
+            }
+            catch (InvalidOperationException) {
+                MessageBox.Show("The selected DLL does not contain any plugin definition", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (BadImageFormatException) {
+                MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
         #endregion
 
         private void lnkProjectHome_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
-                    System.Diagnostics.Process.Start(lnkProjectHome.Text);
+            System.Diagnostics.Process.Start(lnkProjectHome.Text);
         }
 
         private void FitColumns() {
