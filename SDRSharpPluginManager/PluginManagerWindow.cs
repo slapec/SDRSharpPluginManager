@@ -11,7 +11,7 @@ namespace SDRSharpPluginManager {
         public enum ProcessResult {Success = 0, Missing = 1};
         public static String SDRSharpCommonDllFName = "SDRSharp.Common.dll";
         public static String SDRSharpExe = "SDRSharp.exe.Config";
-        public static String[] RequiredFiles = {SDRSharpCommonDllFName, SDRSharpExe};
+        public static String[] RequiredFiles = {SDRSharpExe, SDRSharpCommonDllFName};
         public static String PluginInterfaceName = "ISharpPlugin";
         public static String DisplayNameFieldName = "_displayName";
 
@@ -22,6 +22,18 @@ namespace SDRSharpPluginManager {
 
         public PluginManagerWindow() {
             InitializeComponent();
+
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
+        }
+
+        Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
+            AssemblyName name = new AssemblyName(args.Name);
+            String assemblyNameWithExtension = name.Name + ".dll";
+
+            String assemblyAbsolutePath = Path.Combine(Directory.GetCurrentDirectory(), assemblyNameWithExtension);
+
+            return Assembly.LoadFrom(assemblyAbsolutePath);
         }
 
         #region Parsing config file
@@ -52,9 +64,9 @@ namespace SDRSharpPluginManager {
 
             foreach (String requiredFileName in RequiredFiles) {
                 if (!File.Exists(requiredFileName)) {
-                    String msg = String.Format("File '{0}' is not found in '{1}'", requiredFileName, path);
+                    String msg = String.Format("File '{0}' was not found in '{1}'", requiredFileName, path);
 
-                    MessageBox.Show(msg, "Missing file", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(msg, "Missing file", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
                     return ProcessResult.Missing;
                 }
             }
