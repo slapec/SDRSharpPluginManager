@@ -105,7 +105,7 @@ namespace SDRSharpPluginManager {
         }
         #endregion
 
-        #region Parsing plugin DLL
+        #region Add plugin
         private void btnAdd_Click(object sender, EventArgs e) {
             pluginFileDialog = new OpenFileDialog();
             pluginFileDialog.Filter = PluginFileFilter;
@@ -137,6 +137,8 @@ namespace SDRSharpPluginManager {
 
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
+
+                btnSave.Enabled = true;
             }
             catch (InvalidOperationException) {
                 MessageBox.Show("The selected DLL does not contain any plugin definition", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -147,15 +149,54 @@ namespace SDRSharpPluginManager {
         }
         #endregion
 
+        #region Remove plugin
+        private void RemoveSelected() {
+            ListView.SelectedListViewItemCollection selection = listPlugins.SelectedItems;
+
+            if (selection.Count > 0) {
+                ListViewItem selected = selection[0];
+
+                string message = String.Format("Are you sure you want to remove '{0}'?", selected.Text);
+
+                // First argument is the list itself so we don't loose the focus
+                DialogResult result = MessageBox.Show(listPlugins, message, "Remove", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+                if (result == DialogResult.Yes) {
+                    listPlugins.Items.Remove(selected);
+                    btnRemove.Enabled = false;
+                    btnSave.Enabled = true;
+                }
+            }
+        }
+
+        private void btnRemove_Click(object sender, EventArgs e) {
+            RemoveSelected();
+        }
+
+        private void listPlugins_KeyDown(object sender, KeyEventArgs e) {
+            if (e.KeyCode == Keys.Delete) {
+                RemoveSelected();
+            }
+        }
+        #endregion
+
+        #region Save changes
+        private void btnSave_Click(object sender, EventArgs e) {
+            btnSave.Enabled = false;
+        }
+        #endregion
+
+        #region UI related methods
         private void lnkProjectHome_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             System.Diagnostics.Process.Start(lnkProjectHome.Text);
         }
-
-        #region UI related methods
         private void FitColumns() {
             listPlugins.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent);
             listPlugins.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
             listPlugins.AutoResizeColumn(2, ColumnHeaderAutoResizeStyle.ColumnContent);
+        }
+
+        private void listPlugins_SelectedIndexChanged(object sender, EventArgs e) {
+            btnRemove.Enabled = true;
         }
         #endregion
     }
