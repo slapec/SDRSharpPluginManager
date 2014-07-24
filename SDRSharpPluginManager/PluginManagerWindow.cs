@@ -5,6 +5,8 @@ using System.Configuration;
 using System.Reflection;
 using System.Linq;
 using System.Collections.Specialized;
+using System.Xml;
+using System.Collections.Generic;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
@@ -19,6 +21,8 @@ namespace SDRSharpPluginManager {
         public static string DisplayNameFieldName = "_displayName";
 
         public static string PluginFileFilter = "SDRSharp Plugins (*.dll)|*.dll";
+
+        private SDRSharpConfig config;
 
         private FolderBrowserDialog sdrSharpFolderDialog;
         private OpenFileDialog pluginFileDialog;
@@ -85,19 +89,17 @@ namespace SDRSharpPluginManager {
         }
 
         private void LoadConfig() {
-            // Switching the config file of 'SDRSharpPluginManager' to SDR#'s
-            AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName));
+            config = new SDRSharpConfig(Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName));
 
             // Fill listPlugins
-            NameValueCollection pluginsInConfig = (NameValueCollection)ConfigurationManager.GetSection("sharpPlugins");
-            foreach (string displayName in pluginsInConfig.Keys) {
-                string[] descriptors = pluginsInConfig[displayName].Split(',');
+            foreach (KeyValuePair<string, string> pluginData in config.GetSharpPlugins()) {
+                string[] descriptors = pluginData.Value.Split(',');
                 string typeName = descriptors[0];
                 string assemblyName = descriptors[1];
 
-                ListViewItem pluginItem = new ListViewItem(displayName);
+                ListViewItem pluginItem = new ListViewItem(pluginData.Key);
                 listPlugins.Items.Add(pluginItem);
-
+                
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
             }
@@ -124,13 +126,13 @@ namespace SDRSharpPluginManager {
                 Type pluginEntryType = (from type in pluginAssembly.GetTypes()
                                         where type.GetInterface(PluginInterfaceName) != null
                                         select type).First();
-                string name = (string)pluginEntryType.GetField(DisplayNameFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                string displayName = (string)pluginEntryType.GetField(DisplayNameFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
                 string assemblyName = pluginAssembly.GetName().Name;
 
                 // I hope generating 'typeName' is this simple
                 string typeName = string.Format("{0}.{1}", assemblyName, pluginEntryType.Name);
 
-                ListViewItem pluginItem = new ListViewItem(name);
+                ListViewItem pluginItem = new ListViewItem(displayName);
                 listPlugins.Items.Add(pluginItem);
 
                 pluginItem.Font = new System.Drawing.Font(pluginItem.Font, pluginItem.Font.Style | System.Drawing.FontStyle.Bold);
@@ -138,7 +140,11 @@ namespace SDRSharpPluginManager {
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
 
+                // Adding new plugin to the config
+                config.AddSharpPlugin(displayName, typeName, assemblyName);
+
                 btnSave.Enabled = true;
+                FitColumns();
             }
             catch (InvalidOperationException) {
                 MessageBox.Show("The selected DLL does not contain any plugin definition", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -162,6 +168,7 @@ namespace SDRSharpPluginManager {
                 DialogResult result = MessageBox.Show(listPlugins, message, "Remove", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
                     listPlugins.Items.Remove(selected);
+                    config.RemoveSharpPlugin(selected.Text);
                     btnRemove.Enabled = false;
                     btnSave.Enabled = true;
                 }
@@ -182,6 +189,7 @@ namespace SDRSharpPluginManager {
         #region Save changes
         private void btnSave_Click(object sender, EventArgs e) {
             btnSave.Enabled = false;
+            config.Save();
         }
         #endregion
 
