@@ -21,7 +21,12 @@ namespace SDRSharpPluginManager {
         private void LoadPluginNodes(XmlNodeList nodeList) {
             foreach (XmlNode node in nodeList) {
                 XmlAttributeCollection nodeAttributes = node.Attributes;
-                sharpPluginNodes.Add(nodeAttributes["key"].Value, node);
+                try {
+                    sharpPluginNodes.Add(nodeAttributes["key"].Value, node);
+                }
+                catch (ArgumentException) {
+                    continue;
+                }
             }
         }
 
