@@ -126,7 +126,9 @@ namespace SDRSharpPluginManager {
                 Type pluginEntryType = (from type in pluginAssembly.GetTypes()
                                         where type.GetInterface(PluginInterfaceName) != null
                                         select type).First();
-                string displayName = (string)pluginEntryType.GetField(DisplayNameFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                object pluginObject = Activator.CreateInstance(pluginEntryType);
+
+                string displayName = (string)pluginEntryType.GetProperty("DisplayName").GetValue(pluginObject);
                 string assemblyName = pluginAssembly.GetName().Name;
 
                 // I hope generating 'typeName' is this simple
