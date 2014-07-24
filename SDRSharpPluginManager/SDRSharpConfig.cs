@@ -4,7 +4,9 @@ using System.Xml;
 
 namespace SDRSharpPluginManager {
     class SDRSharpConfig {
-        public string sharpPluginsXPath = "//sharpPlugins/add";
+        // Sorry, I'm still not so familiar with C# types so I use the same types I'd use in Python
+        public static string sharpPluginsRootXPath = "//sharpPlugins";
+        public static string pluginElementName = sharpPluginsRootXPath + "/add";
 
         private XmlDocument externalPluginFile;
         private XmlDocument configFile;
@@ -34,7 +36,7 @@ namespace SDRSharpPluginManager {
             List<XmlNodeList> pluginNodeLists = new List<XmlNodeList>();
             sharpPluginNodes = new Dictionary<string, XmlNode>();
             
-            XmlNode sharpPluginsRoot = configFile.SelectSingleNode("//sharpPlugins");
+            XmlNode sharpPluginsRoot = configFile.SelectSingleNode(sharpPluginsRootXPath);
             XmlAttributeCollection rootAttributes = sharpPluginsRoot.Attributes;
 
             if (rootAttributes["configSource"] != null) {
@@ -43,10 +45,10 @@ namespace SDRSharpPluginManager {
                 externalPluginFile = new XmlDocument();
                 externalPluginFile.Load(externalPluginFilePath);
 
-                LoadPluginNodes(externalPluginFile.SelectNodes(sharpPluginsXPath));
+                LoadPluginNodes(externalPluginFile.SelectNodes(pluginElementName));
             }
             else {
-                LoadPluginNodes(configFile.SelectNodes(sharpPluginsXPath));
+                LoadPluginNodes(configFile.SelectNodes(pluginElementName));
             }
         }
 
