@@ -126,7 +126,9 @@ namespace SDRSharpPluginManager {
                 Type pluginEntryType = (from type in pluginAssembly.GetTypes()
                                         where type.GetInterface(PluginInterfaceName) != null
                                         select type).First();
-                string displayName = (string)pluginEntryType.GetField(DisplayNameFieldName, BindingFlags.NonPublic | BindingFlags.Static).GetValue(null);
+                object pluginObject = Activator.CreateInstance(pluginEntryType);
+
+                string displayName = (string)pluginEntryType.GetProperty("DisplayName").GetValue(pluginObject);
                 string assemblyName = pluginAssembly.GetName().Name;
 
                 // I hope generating 'typeName' is this simple
@@ -152,6 +154,10 @@ namespace SDRSharpPluginManager {
             catch (BadImageFormatException) {
                 MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            catch (FileLoadException) {
+                MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
         }
         #endregion
 
@@ -190,6 +196,10 @@ namespace SDRSharpPluginManager {
         private void btnSave_Click(object sender, EventArgs e) {
             btnSave.Enabled = false;
             config.Save();
+
+            foreach (ListViewItem pluginItem in listPlugins.Items) {
+                pluginItem.Font = new System.Drawing.Font(pluginItem.Font, System.Drawing.FontStyle.Regular);
+            }
         }
         #endregion
 
