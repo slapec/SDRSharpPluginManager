@@ -154,6 +154,10 @@ namespace SDRSharpPluginManager {
             catch (BadImageFormatException) {
                 MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            catch (FileLoadException) {
+                MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            
         }
         #endregion
 
@@ -192,6 +196,10 @@ namespace SDRSharpPluginManager {
         private void btnSave_Click(object sender, EventArgs e) {
             btnSave.Enabled = false;
             config.Save();
+
+            foreach (ListViewItem pluginItem in listPlugins.Items) {
+                pluginItem.Font = new System.Drawing.Font(pluginItem.Font, System.Drawing.FontStyle.Regular);
+            }
         }
         #endregion
 
