@@ -81,6 +81,10 @@ namespace SDRSharpPluginManager {
             }
 
             XmlNode newPlugin = workingFile.CreateNode("element", "add", "");
+            // Add reference to dict
+            sharpPluginNodes.Add(displayName, newPlugin);
+
+            // Add node to dom
             workingFile.SelectSingleNode("//sharpPlugins").AppendChild(newPlugin);
 
             XmlAttribute newPluginKey = workingFile.CreateAttribute("key");
