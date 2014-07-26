@@ -10,7 +10,7 @@ This is a simple program which helps adding and removing plugins to SDR# so you 
 4. Enjoy!
 
 ## Working plugins
-This application should add any valid SDR# plugin to the config file, however it can fail when something unexcepted happens, like some undetectable file is also required to run your plugin (*to be precise: I don't know how to detect yet*). So here is a short list of successfully added plugins so far:
+The application should add any valid SDR# plugin to the config file, however it can fail when something unexcepted happens, like some undetectable file is also required to run your plugin (*to be precise: I don't know how to detect yet*). So here is a short list of successfully added plugins so far:
 
 ### Standard plugins
 - Digital Noise Reduction
@@ -46,13 +46,15 @@ Note: `Frequency Manager` is a drop-in replacement of the one which comes with S
 - [Trunker](http://forums.radioreference.com/software-defined-radio/265660-sdr-trunking-has-been-updated-6.html#post2155643)
 
 
-I'm not planning to create and maintain a plugin list because there are two great one already. Check http://sdrsharp.com/#plugins or http://www.rtl-sdr.com/sdrsharp-plugins
+I've collected these plugins from http://sdrsharp.com/#plugins and http://www.rtl-sdr.com/sdrsharp-plugins. Feel free to message me about other working plugins or just fork this repo and add new ones by your own.
 
 ## Not working plugins
-There aren't any \o/
+There aren't any *yet* \o/
 
 ## Upcomming features
 - [ ] Copy the added DLL to SDR# folder
+- [ ] More detailed error messages in nice dialogs
 
 ## Compatibility
-As I was testing plugins I saw that some plugins are broken due to SDR# API changes. This manager loads the DLLs from where the EXE is located or the program is pointed on the startup. So as long as the `ISharpPlugin.DisplayName` property is there or the config file structure is not change it should work. The oldest SDR# revision I found was 1189 there were no issues.
+As I was testing plugins I saw that some of them are broken due to SDR# API changes. This application loads all dependent files from where the manager EXE is located or where it is pointed to on the startup. So as long as the `ISharpPlugin.DisplayName` property is in the plugin and the config file structure is not changed it should load everyting.
+The oldest SDR# revision I found was 1189 and there were no issues.
