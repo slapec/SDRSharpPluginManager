@@ -134,6 +134,10 @@ namespace SDRSharpPluginManager {
                 // I hope generating 'typeName' is this simple
                 string typeName = string.Format("{0}.{1}", assemblyName, pluginEntryType.Name);
 
+                // Adding new plugin to the config
+                config.AddSharpPlugin(displayName, typeName, assemblyName);
+
+                // Adding new plugin to the list
                 ListViewItem pluginItem = new ListViewItem(displayName);
                 listPlugins.Items.Add(pluginItem);
 
@@ -141,9 +145,6 @@ namespace SDRSharpPluginManager {
 
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
-
-                // Adding new plugin to the config
-                config.AddSharpPlugin(displayName, typeName, assemblyName);
 
                 btnSave.Enabled = true;
                 FitColumns();
@@ -156,6 +157,9 @@ namespace SDRSharpPluginManager {
             }
             catch (FileLoadException) {
                 MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+            catch (ArgumentException) {
+                MessageBox.Show("There is already a plugin in the list with the same description as the one you wanted to add", "Duplicated DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             catch (ReflectionTypeLoadException e) {
                 Exception[] loaderExceptions = e.LoaderExceptions;
