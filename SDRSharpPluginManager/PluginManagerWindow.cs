@@ -157,6 +157,16 @@ namespace SDRSharpPluginManager {
             catch (FileLoadException) {
                 MessageBox.Show("The selected DLL cannot be inserted in SDR#", "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+            catch (ReflectionTypeLoadException e) {
+                Exception[] loaderExceptions = e.LoaderExceptions;
+                foreach (Exception loaderException in loaderExceptions) {
+                    if (loaderException is TypeLoadException) {
+                        string msg = String.Format("The selected DLL cannot be inserted in SDR#.\n\nOriginal error is:\n{0}", ((TypeLoadException)loaderException).Message);
+                        MessageBox.Show(msg, "Invalid DLL", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                    else throw loaderException;
+                }
+            }
             
         }
         #endregion
