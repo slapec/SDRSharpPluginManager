@@ -4,7 +4,7 @@ SDR# Plugin Manager
 This is a simple program which helps adding and removing plugins to SDR# so you don't have to edit SDRSharp.Config by hand.
 
 ## How to use it?
-1. Download the latest release
+1. Download the [latest release](https://github.com/slapec/SDRSharpPluginManager/releases)
 2. Put `SDRSharpPluginManager.exe` into SDR#'s folder or run it where it is and follow the instructions
 3. Add a plugin DLL, remove unused ones and save changes
 4. Enjoy!
