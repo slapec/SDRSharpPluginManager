@@ -10,18 +10,7 @@ using System.Collections.Generic;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
-        public static string ConfigFileName = "SDRSharp.exe.Config";
-        public static string[] RequiredFiles = {ConfigFileName, 
-                                                "SDRSharp.Common.dll",
-                                                "SDRSharp.Radio.dll"};
-
-        public static string PluginInterfaceName = "ISharpPlugin";
-        public static string DisplayNameFieldName = "_displayName";
-
-        public static string PluginFileFilter = "SDRSharp Plugins (*.dll)|*.dll";
-
-        private PluginManager config;
-
+        private PluginManager plugins;
         private OpenFileDialog pluginFileDialog;
 
         public PluginManagerWindow() {
@@ -63,7 +52,7 @@ namespace SDRSharpPluginManager {
         }
 
         private bool CheckDirectory(string path) {
-            foreach (string requiredFileName in RequiredFiles) {
+            foreach (string requiredFileName in Consts.RequiredFiles) {
                 string absolutePath = Path.Combine(path, requiredFileName);
 
                 if (!File.Exists(absolutePath)) {
@@ -76,10 +65,10 @@ namespace SDRSharpPluginManager {
         }
 
         private void LoadConfig(string path) {
-            config = new PluginManager(path);
+            plugins = new PluginManager(path);
 
             // Fill listPlugins
-            foreach (KeyValuePair<string, string> pluginData in config.GetSharpPlugins()) {
+            foreach (KeyValuePair<string, string> pluginData in plugins.GetSharpPlugins()) {
                 string[] descriptors = pluginData.Value.Split(',');
                 string typeName = descriptors[0];
                 string assemblyName = descriptors[1];
@@ -100,7 +89,7 @@ namespace SDRSharpPluginManager {
         #region Add plugin
         private void btnAdd_Click(object sender, EventArgs e) {
             pluginFileDialog = new OpenFileDialog();
-            pluginFileDialog.Filter = PluginFileFilter;
+            pluginFileDialog.Filter = Consts.PluginFileFilter;
 
             if (pluginFileDialog.ShowDialog() == DialogResult.OK) {
                 string pluginFilePath = pluginFileDialog.InitialDirectory + pluginFileDialog.FileName;
@@ -114,7 +103,7 @@ namespace SDRSharpPluginManager {
 
                 // Search for the first class that implements 'ISharpPlugin' interface
                 Type pluginEntryType = (from type in pluginAssembly.GetTypes()
-                                        where type.GetInterface(PluginInterfaceName) != null
+                                        where type.GetInterface(Consts.PluginInterfaceName) != null
                                         select type).First();
                 object pluginObject = Activator.CreateInstance(pluginEntryType);
 
@@ -125,7 +114,7 @@ namespace SDRSharpPluginManager {
                 string typeName = string.Format("{0}.{1}", assemblyName, pluginEntryType.Name);
 
                 // Adding new plugin to the config
-                config.AddSharpPlugin(displayName, typeName, assemblyName);
+                plugins.AddSharpPlugin(displayName, typeName, assemblyName);
 
                 // Adding new plugin to the list
                 ListViewItem pluginItem = new ListViewItem(displayName);
@@ -178,7 +167,7 @@ namespace SDRSharpPluginManager {
                 DialogResult result = MessageBox.Show(listPlugins, message, "Remove", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
                     listPlugins.Items.Remove(selected);
-                    config.RemoveSharpPlugin(selected.Text);
+                    plugins.RemoveSharpPlugin(selected.Text);
                     btnRemove.Enabled = false;
                     btnSave.Enabled = true;
                 }
@@ -199,7 +188,7 @@ namespace SDRSharpPluginManager {
         #region Save changes
         private void btnSave_Click(object sender, EventArgs e) {
             btnSave.Enabled = false;
-            config.Save();
+            plugins.Save();
 
             foreach (ListViewItem pluginItem in listPlugins.Items) {
                 pluginItem.Font = new System.Drawing.Font(pluginItem.Font, System.Drawing.FontStyle.Regular);

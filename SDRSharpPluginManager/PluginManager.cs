@@ -5,10 +5,6 @@ using System.IO;
 
 namespace SDRSharpPluginManager {
     class PluginManager {
-        // Sorry, I'm still not so familiar with C# types so I use the same types I'd use in Python
-        public static string sharpPluginsRootXPath = "//sharpPlugins";
-        public static string pluginElementName = sharpPluginsRootXPath + "/add";
-
         private string basePath;
         private XmlDocument externalPluginFile;
         private XmlDocument configFile;
@@ -17,7 +13,7 @@ namespace SDRSharpPluginManager {
         
         public PluginManager(String path) {
             basePath = path;
-            string absolutePath = Path.Combine(basePath, PluginManagerWindow.ConfigFileName);
+            string absolutePath = Path.Combine(basePath, Consts.ConfigFileName);
 
             configFile = new XmlDocument();
             configFile.Load(absolutePath);
@@ -41,7 +37,7 @@ namespace SDRSharpPluginManager {
             List<XmlNodeList> pluginNodeLists = new List<XmlNodeList>();
             sharpPluginNodes = new Dictionary<string, XmlNode>();
             
-            XmlNode sharpPluginsRoot = configFile.SelectSingleNode(sharpPluginsRootXPath);
+            XmlNode sharpPluginsRoot = configFile.SelectSingleNode(Consts.sharpPluginsRootXPath);
             XmlAttributeCollection rootAttributes = sharpPluginsRoot.Attributes;
 
             if (rootAttributes["configSource"] != null) {
@@ -50,10 +46,10 @@ namespace SDRSharpPluginManager {
                 externalPluginFile = new XmlDocument();
                 externalPluginFile.Load(Path.Combine(basePath, externalPluginFileName));
 
-                LoadPluginNodes(externalPluginFile.SelectNodes(pluginElementName));
+                LoadPluginNodes(externalPluginFile.SelectNodes(Consts.pluginElementName));
             }
             else {
-                LoadPluginNodes(configFile.SelectNodes(pluginElementName));
+                LoadPluginNodes(configFile.SelectNodes(Consts.pluginElementName));
             }
         }
 
@@ -91,7 +87,7 @@ namespace SDRSharpPluginManager {
             sharpPluginNodes.Add(displayName, newPlugin);
 
             // Add node to dom
-            workingFile.SelectSingleNode("//sharpPlugins").AppendChild(newPlugin);
+            workingFile.SelectSingleNode(Consts.sharpPluginsRootXPath).AppendChild(newPlugin);
 
             XmlAttribute newPluginKey = workingFile.CreateAttribute("key");
             newPlugin.Attributes.Append(newPluginKey);
