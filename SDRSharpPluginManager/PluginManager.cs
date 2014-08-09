@@ -41,6 +41,7 @@ namespace SDRSharpPluginManager {
             XmlAttributeCollection rootAttributes = sharpPluginsRoot.Attributes;
 
             if (rootAttributes["configSource"] != null) {
+                // Continue parsing the external plugins.xml (newer sdr# releases)
                 string externalPluginFileName = rootAttributes["configSource"].Value;
 
                 externalPluginFile = new XmlDocument();
@@ -49,11 +50,12 @@ namespace SDRSharpPluginManager {
                 LoadPluginNodes(externalPluginFile.SelectNodes(Consts.pluginElementName));
             }
             else {
+                // For older sdr# releases
                 LoadPluginNodes(configFile.SelectNodes(Consts.pluginElementName));
             }
         }
 
-        public Dictionary<string, string> GetSharpPlugins() {
+        public Dictionary<string, string> GetPluginInformations() {
             Dictionary<string, string> plugins = new Dictionary<string, string>();
             foreach (KeyValuePair<string, XmlNode> plugin in sharpPluginNodes) {
                 plugins.Add(plugin.Key, plugin.Value.Attributes["value"].Value);

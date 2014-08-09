@@ -66,7 +66,7 @@ namespace SDRSharpPluginManager {
             plugins = new PluginManager(path);
 
             // Fill listPlugins
-            foreach (KeyValuePair<string, string> pluginData in plugins.GetSharpPlugins()) {
+            foreach (KeyValuePair<string, string> pluginData in plugins.GetPluginInformations()) {
                 string[] descriptors = pluginData.Value.Split(',');
                 string typeName = descriptors[0];
                 string assemblyName = descriptors[1];
