@@ -1,21 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Xml;
+using System.IO;
 
 namespace SDRSharpPluginManager {
-    class SDRSharpConfig {
+    class PluginManager {
         // Sorry, I'm still not so familiar with C# types so I use the same types I'd use in Python
         public static string sharpPluginsRootXPath = "//sharpPlugins";
         public static string pluginElementName = sharpPluginsRootXPath + "/add";
 
+        private string basePath;
         private XmlDocument externalPluginFile;
         private XmlDocument configFile;
         private Dictionary<string, XmlNode> sharpPluginNodes;
         private HashSet<XmlDocument> modifiedFiles = new HashSet<XmlDocument>();
         
-        public SDRSharpConfig(String path) {
+        public PluginManager(String path) {
+            basePath = path;
+            string absolutePath = Path.Combine(basePath, PluginManagerWindow.ConfigFileName);
+
             configFile = new XmlDocument();
-            configFile.Load(path);
+            configFile.Load(absolutePath);
 
             ParseSharpPlugins();
         }
@@ -40,10 +45,10 @@ namespace SDRSharpPluginManager {
             XmlAttributeCollection rootAttributes = sharpPluginsRoot.Attributes;
 
             if (rootAttributes["configSource"] != null) {
-                string externalPluginFilePath = rootAttributes["configSource"].Value;
+                string externalPluginFileName = rootAttributes["configSource"].Value;
 
                 externalPluginFile = new XmlDocument();
-                externalPluginFile.Load(externalPluginFilePath);
+                externalPluginFile.Load(Path.Combine(basePath, externalPluginFileName));
 
                 LoadPluginNodes(externalPluginFile.SelectNodes(pluginElementName));
             }
@@ -75,6 +80,7 @@ namespace SDRSharpPluginManager {
 
             if (externalPluginFile != null) {
                 workingFile = externalPluginFile;
+
             }
             else {
                 workingFile = configFile;
@@ -94,7 +100,7 @@ namespace SDRSharpPluginManager {
             XmlAttribute newPluginValue = workingFile.CreateAttribute("value");
             newPlugin.Attributes.Append(newPluginValue);
             newPluginValue.Value = String.Format("{0},{1}", typeName, assemblyName);
-            modifiedFiles.Add(externalPluginFile);
+            modifiedFiles.Add(workingFile);
         }
 
         public void Save() {

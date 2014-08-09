@@ -20,7 +20,7 @@ namespace SDRSharpPluginManager {
 
         public static string PluginFileFilter = "SDRSharp Plugins (*.dll)|*.dll";
 
-        private SDRSharpConfig config;
+        private PluginManager config;
 
         private OpenFileDialog pluginFileDialog;
 
@@ -59,8 +59,7 @@ namespace SDRSharpPluginManager {
                     break;
                 }
             }
-
-            LoadConfig();
+            LoadConfig(sdrSharpFolderDialog.SelectedPath);
         }
 
         private bool CheckDirectory(string path) {
@@ -76,8 +75,8 @@ namespace SDRSharpPluginManager {
             return true;
         }
 
-        private void LoadConfig() {
-            config = new SDRSharpConfig(Path.Combine(Directory.GetCurrentDirectory(), ConfigFileName));
+        private void LoadConfig(string path) {
+            config = new PluginManager(path);
 
             // Fill listPlugins
             foreach (KeyValuePair<string, string> pluginData in config.GetSharpPlugins()) {
@@ -91,7 +90,10 @@ namespace SDRSharpPluginManager {
                 pluginItem.SubItems.Add(typeName);
                 pluginItem.SubItems.Add(assemblyName);
             }
+
+            tBoxSDRSharpPathValue.Text = path;
             FitColumns();
+            Directory.SetCurrentDirectory(path);
         }
         #endregion
 
