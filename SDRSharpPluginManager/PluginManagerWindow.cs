@@ -1,12 +1,8 @@
 ﻿using System;
 using System.IO;
 using System.Windows.Forms;
-using System.Configuration;
 using System.Reflection;
 using System.Linq;
-using System.Collections.Specialized;
-using System.Xml;
-using System.Collections.Generic;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
@@ -15,9 +11,6 @@ namespace SDRSharpPluginManager {
 
         public PluginManagerWindow() {
             InitializeComponent();
-
-            AppDomain currentDomain = AppDomain.CurrentDomain;
-            currentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
         }
 
         // This handler is needed to satisfy the dependencies of a parsed plugin
@@ -66,20 +59,14 @@ namespace SDRSharpPluginManager {
             plugins = new PluginManager(path);
 
             // Fill listPlugins
-            foreach (KeyValuePair<string, string> pluginData in plugins.GetPluginInformations()) {
-                string[] descriptors = pluginData.Value.Split(',');
-                string typeName = descriptors[0];
-                string assemblyName = descriptors[1];
-
-                ListViewItem pluginItem = new ListViewItem(pluginData.Key);
+            foreach (Plugin plugin in plugins.Plugins) {
+                ListViewItem pluginItem = new PluginListViewItem(plugin);
                 listPlugins.Items.Add(pluginItem);
-                
-                pluginItem.SubItems.Add(typeName);
-                pluginItem.SubItems.Add(assemblyName);
             }
-
-            tBoxSDRSharpPathValue.Text = path;
             FitColumns();
+            tBoxSDRSharpPathValue.Text = path;
+
+            SetupHandlers();
             Directory.SetCurrentDirectory(path);
         }
         #endregion
@@ -90,7 +77,7 @@ namespace SDRSharpPluginManager {
             pluginFileDialog.Filter = Consts.PluginFileFilter;
 
             if (pluginFileDialog.ShowDialog() == DialogResult.OK) {
-                string pluginFilePath = pluginFileDialog.InitialDirectory + pluginFileDialog.FileName;
+                string pluginFilePath = Path.Combine(pluginFileDialog.InitialDirectory, pluginFileDialog.FileName);
                 LoadDLL(pluginFilePath);
             }
         }
@@ -112,10 +99,11 @@ namespace SDRSharpPluginManager {
                 string typeName = string.Format("{0}.{1}", assemblyName, pluginEntryType.Name);
 
                 // Adding new plugin to the config
-                plugins.AddSharpPlugin(displayName, typeName, assemblyName);
+                Plugin addedPlugin = new Plugin(displayName, typeName, assemblyName);
+                plugins.Add(addedPlugin);
 
                 // Adding new plugin to the list
-                ListViewItem pluginItem = new ListViewItem(displayName);
+                ListViewItem pluginItem = new PluginListViewItem(addedPlugin);
                 listPlugins.Items.Add(pluginItem);
 
                 pluginItem.Font = new System.Drawing.Font(pluginItem.Font, pluginItem.Font.Style | System.Drawing.FontStyle.Bold);
@@ -165,7 +153,7 @@ namespace SDRSharpPluginManager {
                 DialogResult result = MessageBox.Show(listPlugins, message, "Remove", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
                 if (result == DialogResult.Yes) {
                     listPlugins.Items.Remove(selected);
-                    plugins.RemoveSharpPlugin(selected.Text);
+                    plugins.Remove(((PluginListViewItem)selected).Plugin);
                     btnRemove.Enabled = false;
                     btnSave.Enabled = true;
                 }
@@ -180,6 +168,15 @@ namespace SDRSharpPluginManager {
             if (e.KeyCode == Keys.Delete) {
                 RemoveSelected();
             }
+        }
+        #endregion
+
+        #region Enable/disable
+        void listPlugins_ItemChecked(object sender, ItemCheckedEventArgs e) {
+            PluginListViewItem checkedItem = (PluginListViewItem)e.Item;
+
+            checkedItem.Plugin.Enabled = checkedItem.Checked;
+            btnSave.Enabled = true;
         }
         #endregion
 
@@ -203,6 +200,7 @@ namespace SDRSharpPluginManager {
             listPlugins.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent);
             listPlugins.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
             listPlugins.AutoResizeColumn(2, ColumnHeaderAutoResizeStyle.ColumnContent);
+            listPlugins.AutoResizeColumn(3, ColumnHeaderAutoResizeStyle.ColumnContent);
         }
 
         private void listPlugins_SelectedIndexChanged(object sender, EventArgs e) {
@@ -218,5 +216,12 @@ namespace SDRSharpPluginManager {
             return dialog;
         }
         #endregion
+
+        private void SetupHandlers() {
+            AppDomain currentDomain = AppDomain.CurrentDomain;
+            currentDomain.AssemblyResolve += currentDomain_AssemblyResolve;
+
+            listPlugins.ItemChecked += listPlugins_ItemChecked;
+        }
     }
 }

@@ -33,6 +33,7 @@
             this.btnRemove = new System.Windows.Forms.Button();
             this.btnAdd = new System.Windows.Forms.Button();
             this.btnSave = new System.Windows.Forms.Button();
+            this.colEnabled = ((System.Windows.Forms.ColumnHeader)(new System.Windows.Forms.ColumnHeader()));
             this.SuspendLayout();
             // 
             // lnkProjectHome
@@ -72,7 +73,9 @@
             this.listPlugins.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
+            this.listPlugins.CheckBoxes = true;
             this.listPlugins.Columns.AddRange(new System.Windows.Forms.ColumnHeader[] {
+            this.colEnabled,
             this.colName,
             this.colType,
             this.colAssembly});
@@ -142,6 +145,10 @@
             this.btnSave.UseVisualStyleBackColor = true;
             this.btnSave.Click += new System.EventHandler(this.btnSave_Click);
             // 
+            // colEnabled
+            // 
+            this.colEnabled.Text = "";
+            // 
             // PluginManagerWindow
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -175,6 +182,7 @@
         private System.Windows.Forms.ColumnHeader colType;
         private System.Windows.Forms.ColumnHeader colAssembly;
         private System.Windows.Forms.Button btnSave;
+        private System.Windows.Forms.ColumnHeader colEnabled;
 
     }
 }
