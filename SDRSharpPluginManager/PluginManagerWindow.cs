@@ -10,8 +10,8 @@ using System.Collections.Generic;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
-        private PluginManager plugins;
         private OpenFileDialog pluginFileDialog;
+        private PluginManager plugins;
 
         public PluginManagerWindow() {
             InitializeComponent();
@@ -24,7 +24,6 @@ namespace SDRSharpPluginManager {
         Assembly currentDomain_AssemblyResolve(object sender, ResolveEventArgs args) {
             AssemblyName unresolvedAssemblyName = new AssemblyName(args.Name);
             string unresolvedAssemblyNameWithExtension = unresolvedAssemblyName.Name + ".dll";
-
             string unresolvedAssemblyAbsolutePath = Path.Combine(Directory.GetCurrentDirectory(), unresolvedAssemblyNameWithExtension);
 
             return Assembly.LoadFrom(unresolvedAssemblyAbsolutePath);
@@ -35,7 +34,6 @@ namespace SDRSharpPluginManager {
             SetWorkingDirectory();
         }
 
-        //Still not the best method name
         private void SetWorkingDirectory() {
             DialogResult dialogResult;
             FolderBrowserDialog sdrSharpFolderDialog = FolderBrowserFactory();
@@ -107,7 +105,7 @@ namespace SDRSharpPluginManager {
                                         select type).First();
                 object pluginObject = Activator.CreateInstance(pluginEntryType);
 
-                string displayName = (string)pluginEntryType.GetProperty("DisplayName").GetValue(pluginObject);
+                string displayName = (string)pluginEntryType.GetProperty(Consts.DisplayNameFieldName).GetValue(pluginObject);
                 string assemblyName = pluginAssembly.GetName().Name;
 
                 // I hope generating 'typeName' is this simple

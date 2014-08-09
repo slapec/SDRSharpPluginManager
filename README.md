@@ -54,6 +54,7 @@ There aren't any *yet* \o/
 ## Upcomming features
 - [ ] Copy the added DLL to SDR# folder
 - [ ] Enable/Disable feature
+- [ ] Reordering
 - [ ] More detailed error messages in nice dialogs
 
 ## Compatibility

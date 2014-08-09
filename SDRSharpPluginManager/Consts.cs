@@ -12,7 +12,7 @@ namespace SDRSharpPluginManager {
                                                 "SDRSharp.Radio.dll"};
 
         public static string PluginInterfaceName = "ISharpPlugin";
-        public static string DisplayNameFieldName = "_displayName";
+        public static string DisplayNameFieldName = "DisplayName";
 
         public static string PluginFileFilter = "SDRSharp Plugins (*.dll)|*.dll";
         public static string sharpPluginsRootXPath = "//sharpPlugins";
