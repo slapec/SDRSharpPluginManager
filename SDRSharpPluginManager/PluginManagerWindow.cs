@@ -10,8 +10,6 @@ using System.Collections.Generic;
 
 namespace SDRSharpPluginManager {
     public partial class PluginManagerWindow : Form {
-        public enum ProcessResult {Success = 0, Missing = 1};
-
         public static string ConfigFileName = "SDRSharp.exe.Config";
         public static string[] RequiredFiles = {ConfigFileName, 
                                                 "SDRSharp.Common.dll",
@@ -24,7 +22,6 @@ namespace SDRSharpPluginManager {
 
         private SDRSharpConfig config;
 
-        private FolderBrowserDialog sdrSharpFolderDialog;
         private OpenFileDialog pluginFileDialog;
 
         public PluginManagerWindow() {
@@ -46,46 +43,37 @@ namespace SDRSharpPluginManager {
 
         #region Parsing config file
         private void PluginManagerWindow_Load(object sender, EventArgs e) {
+            SetWorkingDirectory();
+        }
+
+        //Still not the best method name
+        private void SetWorkingDirectory() {
             DialogResult dialogResult;
-            ProcessResult processResult;
+            FolderBrowserDialog sdrSharpFolderDialog = FolderBrowserFactory();
 
-            // Folder dialog is here so it is shown right on running this program
-            sdrSharpFolderDialog = new FolderBrowserDialog();
-            sdrSharpFolderDialog.Description = "Select the location of SDR#";
-            sdrSharpFolderDialog.SelectedPath = Directory.GetCurrentDirectory();
-            sdrSharpFolderDialog.ShowNewFolderButton = false;
-
-            processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
-            // Keep showing folder dialog until a the correct folder is selected or 'Cancel' pressed
-            while (processResult != ProcessResult.Success) {
+            //Maybe the CWD is already a valid directory so we can skip showing the dialog
+            while(CheckDirectory(sdrSharpFolderDialog.SelectedPath) != true){
                 dialogResult = sdrSharpFolderDialog.ShowDialog();
                 if (dialogResult == DialogResult.Cancel) {
                     this.Close();
                     break;
                 }
-                else {
-                    processResult = ProcessDirectory(sdrSharpFolderDialog.SelectedPath);
-                }
             }
+
+            LoadConfig();
         }
 
-        // Setting the CWD to the folder of SDR# and parse its config file
-        private ProcessResult ProcessDirectory(string path) {
-            Directory.SetCurrentDirectory(path);
-
-            // Check existance of some required files in folder
+        private bool CheckDirectory(string path) {
             foreach (string requiredFileName in RequiredFiles) {
-                if (!File.Exists(requiredFileName)) {
-                    string msg = string.Format("File '{0}' was not found in '{1}'", requiredFileName, path);
+                string absolutePath = Path.Combine(path, requiredFileName);
 
+                if (!File.Exists(absolutePath)) {
+                    string msg = string.Format("File '{0}' is missing", absolutePath);
                     MessageBox.Show(msg, "Missing file", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-                    return ProcessResult.Missing;
+                    return false;
                 }
             }
-
-            tBoxSDRSharpPathValue.Text = path;
-            this.LoadConfig();
-            return ProcessResult.Success;
+            return true;
         }
 
         private void LoadConfig() {
@@ -221,6 +209,7 @@ namespace SDRSharpPluginManager {
         private void lnkProjectHome_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e) {
             System.Diagnostics.Process.Start(lnkProjectHome.Text);
         }
+
         private void FitColumns() {
             listPlugins.AutoResizeColumn(0, ColumnHeaderAutoResizeStyle.ColumnContent);
             listPlugins.AutoResizeColumn(1, ColumnHeaderAutoResizeStyle.ColumnContent);
@@ -229,6 +218,15 @@ namespace SDRSharpPluginManager {
 
         private void listPlugins_SelectedIndexChanged(object sender, EventArgs e) {
             btnRemove.Enabled = true;
+        }
+
+        private FolderBrowserDialog FolderBrowserFactory() {
+            FolderBrowserDialog dialog = new FolderBrowserDialog();
+            dialog.Description = "Select the location of SDR#";
+            dialog.SelectedPath = Directory.GetCurrentDirectory();
+            dialog.ShowNewFolderButton = false;
+
+            return dialog;
         }
         #endregion
     }
