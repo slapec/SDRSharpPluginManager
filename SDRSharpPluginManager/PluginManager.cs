@@ -47,7 +47,7 @@ namespace SDRSharpPluginManager {
                 ParseNode(singleNodeDocument.DocumentElement);
             }
             else {
-                throw new ArgumentException("Plugin class must be instanced with XmlElement or XmlComment node");
+                throw new ArgumentException("Argument must be XmlElement or XmlComment subclass of XmlNode");
             }
         }
         public Plugin(string _displayName, string _typeName, string _assemblyName) {
